@@ -7,7 +7,6 @@ class Lockbox < Formula
   depends_on "age"
   depends_on "jq"
   depends_on "sops"
-  depends_on cask: "1password-cli"
 
   def install
     libexec.install "bin", "lib"
@@ -16,6 +15,8 @@ class Lockbox < Formula
 
   def caveats
     <<~EOS
+      Also requires 1Password CLI: brew install --cask 1password-cli
+
       Run `lockbox init` in a project to scaffold .lockbox/config.env
       Then: eval "$(op signin)" && lockbox setup
     EOS
