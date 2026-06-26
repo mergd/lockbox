@@ -5,18 +5,19 @@ SOPS + 1Password CLI for secrets and encrypted documents. Works across any repo 
 ## Install
 
 ```bash
-# From GitHub (recommended)
-brew install mergd/lockbox/lockbox
-
-# Or directly from formula URL
-brew install --formula https://raw.githubusercontent.com/mergd/lockbox/main/Formula/lockbox.rb
-
-# Or local dev
-git clone https://github.com/mergd/lockbox.git
-cd lockbox && brew install --formula Formula/lockbox.rb
+brew tap mergd/lockbox https://github.com/mergd/lockbox
+brew trust mergd/lockbox
+brew install --HEAD mergd/lockbox/lockbox
 ```
 
 Requires: `sops`, `age`, `1password-cli`, `jq` (installed as dependencies).
+
+Local dev:
+
+```bash
+git clone https://github.com/mergd/lockbox.git
+brew tap mergd/lockbox "$(pwd)/lockbox"  # or symlink bin/lockbox to ~/bin
+```
 
 ## New project
 

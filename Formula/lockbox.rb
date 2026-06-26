@@ -7,7 +7,7 @@ class Lockbox < Formula
   depends_on "age"
   depends_on "jq"
   depends_on "sops"
-  depends_on "1password-cli"
+  depends_on cask: "1password-cli"
 
   def install
     libexec.install "bin", "lib"
