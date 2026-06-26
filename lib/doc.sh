@@ -50,6 +50,12 @@ lockbox_doc() {
         dest="$records_dir/$(basename "$src").age"
       fi
 
+      [[ "$dest" != /* ]] && dest="$LOCKBOX_ROOT/$dest"
+      if [[ "$dest" != "$records_dir"/* ]]; then
+        dest="${dest/documents\/records/$records_dir/}"
+        [[ "$dest" != "$records_dir"/* ]] && dest="$records_dir/$(basename "$dest")"
+      fi
+
       local_dest="$(local_path_for_age "$dest")"
       mkdir -p "$(dirname "$dest")" "$(dirname "$local_dest")"
       cp "$src" "$local_dest"
