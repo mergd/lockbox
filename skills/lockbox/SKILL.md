@@ -9,7 +9,7 @@ description: >-
 
 # lockbox
 
-Cross-repo CLI for SOPS secrets + age-encrypted documents. Private keys live in 1Password; encrypted files go to GitHub.
+Cross-repo CLI for SOPS secrets + age-encrypted documents. Private keys bootstrap from 1Password and cache locally in `.lockbox/age.key`; encrypted files go to GitHub.
 
 Install CLI: `brew tap mergd/lockbox https://github.com/mergd/lockbox && brew install --HEAD mergd/lockbox/lockbox`
 
@@ -18,18 +18,18 @@ Install this skill in a project: `lockbox skill install` → `.agents/skills/loc
 ## Before any secret/doc operation
 
 ```bash
-eval "$(op signin)"
 lockbox where
 ```
 
-Run from inside the project. lockbox walks up to find `.lockbox/config.env`.
+Run from inside the project. lockbox walks up to find `.lockbox/config.env`. If `.lockbox/age.key` is missing, run `eval "$(op signin)"` then `lockbox setup` to sync it from 1Password.
 
 ## Architecture
 
 | Where | What |
 |-------|------|
 | GitHub | `secrets/*`, `documents/records/**/*.age`, `.sops.yaml` |
-| 1Password | Age private key (`OP_ITEM` in config) |
+| 1Password | Bootstrap copy of age private key (`OP_ITEM` in config) |
+| `.lockbox/age.key` | Local age private key cache (gitignored) |
 | `documents/local/` | Decrypted workspace (gitignored) |
 | `documents/inbox/` | Intake (gitignored) |
 
@@ -44,9 +44,9 @@ lockbox where
 
 ## Agent rules
 
-**Do:** use `lockbox` commands; run `eval "$(op signin)"` first; commit only encrypted `secrets/` and `documents/records/`; edit docs in `documents/local/` then `lockbox doc sync --all`
+**Do:** use `lockbox` commands; run `lockbox setup` after signing into 1Password when `.lockbox/age.key` is missing; commit only encrypted `secrets/` and `documents/records/`; edit docs in `documents/local/` then `lockbox doc sync --all`
 
-**Do not:** commit `documents/local/`, `documents/inbox/`, `.lockbox/local.env`, plaintext files, or private keys
+**Do not:** commit `documents/local/`, `documents/inbox/`, `.lockbox/local.env`, `.lockbox/age.key`, plaintext files, or private keys
 
 ## Workflows
 

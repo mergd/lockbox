@@ -55,6 +55,12 @@ lockbox doc list
 lockbox where    # show project root + config
 ```
 
+## Local key cache
+
+`lockbox setup` syncs the age private key from 1Password into `.lockbox/age.key` with `0600` permissions. After that, `lockbox secret` and `lockbox doc` commands use the local key cache and do not need an active 1Password session unless the cache is missing.
+
+`.lockbox/age.key` is gitignored by `lockbox init`; never commit it.
+
 ## Project config
 
 `.lockbox/config.env`:
@@ -66,7 +72,7 @@ SECRETS_DIR=secrets
 DOCUMENTS_DIR=documents
 ```
 
-Optional `.lockbox/local.env` (gitignored) for `OP_ACCOUNT` overrides.
+Optional `.lockbox/local.env` (gitignored) for `OP_ACCOUNT` and `LOCKBOX_AGE_KEY_FILE` overrides.
 
 ## direnv
 
@@ -74,7 +80,7 @@ Optional `.lockbox/local.env` (gitignored) for `OP_ACCOUNT` overrides.
 # .envrc
 dotenv .lockbox/config.env
 dotenv_if_exists .lockbox/local.env
-export SOPS_AGE_KEY_CMD="op read --no-newline -- op://${OP_VAULT}/${OP_ITEM}/password"
+export SOPS_AGE_KEY_FILE="${LOCKBOX_AGE_KEY_FILE:-$PWD/.lockbox/age.key}"
 ```
 
 ## Architecture
@@ -82,5 +88,6 @@ export SOPS_AGE_KEY_CMD="op read --no-newline -- op://${OP_VAULT}/${OP_ITEM}/pas
 | Location | Contents |
 |----------|----------|
 | GitHub | Encrypted `secrets/*`, `documents/records/*.age`, public key in `.sops.yaml` |
-| 1Password | Age private key |
+| 1Password | Bootstrap copy of age private key |
+| `.lockbox/age.key` | Local age private key cache (gitignored) |
 | `documents/local/` | Decrypted workspace (gitignored) |

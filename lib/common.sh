@@ -24,10 +24,17 @@ load_config() {
   DOCUMENTS_DIR="${DOCUMENTS_DIR:-documents}"
   OP_VAULT="${OP_VAULT:-Personal}"
   OP_ITEM="${OP_ITEM:-$(basename "$LOCKBOX_ROOT")-sops-age-key}"
+  LOCKBOX_AGE_KEY_FILE="${LOCKBOX_AGE_KEY_FILE:-$LOCKBOX_ROOT/.lockbox/age.key}"
 
-  export OP_VAULT OP_ITEM SECRETS_DIR DOCUMENTS_DIR
+  export OP_VAULT OP_ITEM SECRETS_DIR DOCUMENTS_DIR LOCKBOX_AGE_KEY_FILE
   export SOPS_AGE_KEY_OP_REF="op://${OP_VAULT}/${OP_ITEM}/password"
-  export SOPS_AGE_KEY_CMD="op read --no-newline -- ${SOPS_AGE_KEY_OP_REF}"
+  if [[ -f "$LOCKBOX_AGE_KEY_FILE" ]]; then
+    export SOPS_AGE_KEY_FILE="$LOCKBOX_AGE_KEY_FILE"
+    unset SOPS_AGE_KEY_CMD
+  else
+    unset SOPS_AGE_KEY_FILE
+    export SOPS_AGE_KEY_CMD="op read --no-newline -- ${SOPS_AGE_KEY_OP_REF}"
+  fi
 }
 
 op_cmd() {
@@ -39,6 +46,10 @@ op_cmd() {
 }
 
 require_op() {
+  if [[ -f "${LOCKBOX_AGE_KEY_FILE:-}" ]]; then
+    return 0
+  fi
+
   if ! op_cmd whoami &>/dev/null; then
     echo "1Password CLI not signed in. Run:" >&2
     echo '  eval "$(op signin)"' >&2
@@ -53,7 +64,25 @@ op_item_id() {
 }
 
 read_private_key() {
-  op_cmd read --no-newline "$SOPS_AGE_KEY_OP_REF"
+  if [[ -f "${LOCKBOX_AGE_KEY_FILE:-}" ]]; then
+    cat "$LOCKBOX_AGE_KEY_FILE"
+  elif [[ -n "${LOCKBOX_AGE_KEY:-}" ]]; then
+    printf '%s' "$LOCKBOX_AGE_KEY"
+  else
+    op_cmd read --no-newline "$SOPS_AGE_KEY_OP_REF"
+  fi
+}
+
+write_private_key_cache() {
+  local key_material="$1"
+
+  [[ -n "${LOCKBOX_AGE_KEY_FILE:-}" ]] || return 0
+  mkdir -p "$(dirname "$LOCKBOX_AGE_KEY_FILE")"
+  umask 077
+  printf '%s' "$key_material" >"$LOCKBOX_AGE_KEY_FILE"
+  chmod 600 "$LOCKBOX_AGE_KEY_FILE"
+  export SOPS_AGE_KEY_FILE="$LOCKBOX_AGE_KEY_FILE"
+  unset SOPS_AGE_KEY_CMD
 }
 
 public_key_from_private() {

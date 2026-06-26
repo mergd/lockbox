@@ -20,6 +20,8 @@ EOF
     cat > .lockbox/local.env.example <<'EOF'
 # Copy to .lockbox/local.env (gitignored) for local overrides
 OP_ACCOUNT=
+# Optional override; default is .lockbox/age.key
+LOCKBOX_AGE_KEY_FILE=
 EOF
   fi
 
@@ -28,6 +30,7 @@ EOF
 
 # lockbox
 .lockbox/local.env
+.lockbox/age.key
 secrets/**/*.dec.*
 secrets/**/*.plain.*
 documents/inbox/*
@@ -36,6 +39,12 @@ documents/local/*
 !documents/local/.gitkeep
 documents/**/*.plain.*
 documents/**/*.dec.*
+EOF
+  fi
+
+  if [[ -f .gitignore ]] && ! grep -q '\.lockbox/age\.key' .gitignore 2>/dev/null; then
+    cat >> .gitignore <<'EOF'
+.lockbox/age.key
 EOF
   fi
 
