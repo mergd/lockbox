@@ -34,7 +34,7 @@ Usage:
   lockbox doc open [file.age]      Open from local workspace
   lockbox doc edit <file>          Edit SOPS text doc
   lockbox doc list                 List docs
-  lockbox skill install            Copy agent skill to .cursor/skills/lockbox/
+  lockbox skill install            Copy agent skill to .agents/skills/lockbox/
   lockbox where                    Show project root + config
 
 Requires .lockbox/config.env in project (or parent directory).

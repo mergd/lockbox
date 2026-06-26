@@ -18,10 +18,10 @@ Requires: `sops`, `age`, `jq` (brew dependencies).
 The skill ships with lockbox at `skills/lockbox/SKILL.md`. Install into each project:
 
 ```bash
-lockbox skill install   # writes .cursor/skills/lockbox/SKILL.md
+lockbox skill install   # writes .agents/skills/lockbox/SKILL.md
 ```
 
-Commit `.cursor/skills/lockbox/` in project repos so Cursor agents load it from the repo — not from `~/.cursor/skills/`.
+Commit `.agents/skills/lockbox/` in project repos so agents load it from the repo.
 
 ## New project
 

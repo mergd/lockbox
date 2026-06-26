@@ -13,7 +13,7 @@ Cross-repo CLI for SOPS secrets + age-encrypted documents. Private keys live in 
 
 Install CLI: `brew tap mergd/lockbox https://github.com/mergd/lockbox && brew install --HEAD mergd/lockbox/lockbox`
 
-Install this skill in a project: `lockbox skill install`
+Install this skill in a project: `lockbox skill install` → `.agents/skills/lockbox/SKILL.md`
 
 ## Before any secret/doc operation
 
