@@ -9,7 +9,7 @@ class Lockbox < Formula
   depends_on "sops"
 
   def install
-    libexec.install "bin", "lib"
+    libexec.install "bin", "lib", "skills"
     bin.install_symlink libexec/"bin/lockbox" => "lockbox"
   end
 

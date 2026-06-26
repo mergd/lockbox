@@ -46,4 +46,5 @@ EOF
   echo "Next:"
   echo "  eval \"\$(op signin)\""
   echo "  lockbox setup"
+  echo "  lockbox skill install"
 }
