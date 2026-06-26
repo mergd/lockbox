@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LOCKBOX_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+lockbox_resolve_script() {
+  local src="${BASH_SOURCE[0]}"
+  while [[ -L "$src" ]]; do
+    local dir
+    dir="$(cd "$(dirname "$src")" && pwd)"
+    src="$(readlink "$src")"
+    [[ "$src" != /* ]] && src="$dir/$src"
+  done
+  echo "$src"
+}
+
+LOCKBOX_HOME="$(cd "$(dirname "$(lockbox_resolve_script)")/.." && pwd)"
 
 # shellcheck source=/dev/null
 source "$LOCKBOX_HOME/lib/common.sh"
