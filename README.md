@@ -4,19 +4,31 @@ SOPS + 1Password CLI for secrets and encrypted documents. Works across any repo 
 
 ## Install
 
+**Note:** The tap clones from GitHub. If `mergd/lockbox` is **private**, you need GitHub auth (`gh auth login` or SSH keys). Consider making the lockbox repo **public** — it contains no secrets, only the CLI.
+
 ```bash
+# Requires access to github.com/mergd/lockbox
 brew tap mergd/lockbox https://github.com/mergd/lockbox
 brew trust mergd/lockbox
 brew install --HEAD mergd/lockbox/lockbox
+brew install --cask 1password-cli   # not a brew formula
 ```
 
-Requires: `sops`, `age`, `1password-cli`, `jq` (installed as dependencies).
+Requires: `sops`, `age`, `jq` (installed as dependencies).
 
-Local dev:
+**Without brew tap** (private repo, no auth):
+
+```bash
+git clone git@github.com:mergd/lockbox.git ~/dev/lockbox
+ln -sf ~/dev/lockbox/bin/lockbox ~/bin/lockbox   # or add to PATH
+```
+
+Local dev tap:
 
 ```bash
 git clone https://github.com/mergd/lockbox.git
-brew tap mergd/lockbox "$(pwd)/lockbox"  # or symlink bin/lockbox to ~/bin
+brew tap mergd/lockbox "$(pwd)/lockbox"
+brew install --HEAD mergd/lockbox/lockbox
 ```
 
 ## New project
