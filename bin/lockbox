@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+LOCKBOX_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# shellcheck source=/dev/null
+source "$LOCKBOX_HOME/lib/common.sh"
+
+usage() {
+  cat <<'EOF'
+lockbox — SOPS + 1Password secrets and document CLI
+
+Usage:
+  lockbox init [name]              Scaffold .lockbox/ in current project
+  lockbox setup                    Sync 1Password key + .sops.yaml
+  lockbox secret edit <file>       Edit encrypted secret
+  lockbox secret new <file>        Create encrypted secret
+  lockbox secret decrypt <file>    Decrypt secret to stdout
+  lockbox secret encrypt <file>    Encrypt file in place
+  lockbox doc add <file>           Encrypt doc → records/ + local/
+  lockbox doc checkout [--all]     Decrypt to documents/local/
+  lockbox doc sync [--all]         Re-encrypt from documents/local/
+  lockbox doc open [file.age]      Open from local workspace
+  lockbox doc edit <file>          Edit SOPS text doc
+  lockbox doc list                 List docs
+  lockbox where                    Show project root + config
+
+Requires .lockbox/config.env in project (or parent directory).
+EOF
+}
+
+main() {
+  local cmd="${1:-}"
+
+  case "$cmd" in
+    init)
+      shift
+      # shellcheck source=/dev/null
+      source "$LOCKBOX_HOME/lib/init.sh"
+      lockbox_init "${1:-}"
+      ;;
+    setup)
+      lockbox_find_project_root
+      load_config
+      cd "$LOCKBOX_ROOT"
+      # shellcheck source=/dev/null
+      source "$LOCKBOX_HOME/lib/setup.sh"
+      lockbox_setup
+      ;;
+    secret)
+      shift
+      lockbox_find_project_root
+      load_config
+      cd "$LOCKBOX_ROOT"
+      # shellcheck source=/dev/null
+      source "$LOCKBOX_HOME/lib/secret.sh"
+      lockbox_secret "$@"
+      ;;
+    doc)
+      shift
+      lockbox_find_project_root
+      load_config
+      cd "$LOCKBOX_ROOT"
+      # shellcheck source=/dev/null
+      source "$LOCKBOX_HOME/lib/doc.sh"
+      lockbox_doc "$@"
+      ;;
+    where)
+      lockbox_find_project_root
+      load_config
+      echo "root:   $LOCKBOX_ROOT"
+      echo "config: $LOCKBOX_ROOT/.lockbox/config.env"
+      echo "vault:  $OP_VAULT"
+      echo "item:   $OP_ITEM"
+      echo "key:    $SOPS_AGE_KEY_OP_REF"
+      ;;
+    help|-h|--help|"")
+      usage
+      ;;
+    *)
+      echo "Unknown command: $cmd" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
